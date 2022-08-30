@@ -67,14 +67,16 @@ class BrowserHttpClientAdapter implements HttpClientAdapter {
       Future.delayed(Duration(milliseconds: options.connectTimeout)).then(
         (value) {
           if (!haveSent) {
-            completer.completeError(
-              DioError(
-                requestOptions: options,
-                error: 'Connecting timed out [${options.connectTimeout}ms]',
-                type: DioErrorType.connectTimeout,
-              ),
-              StackTrace.current,
-            );
+            if (!completer.isCompleted) {
+              completer.completeError(
+                DioError(
+                  requestOptions: options,
+                  error: 'Connecting timed out [${options.connectTimeout}ms]',
+                  type: DioErrorType.connectTimeout,
+                ),
+                StackTrace.current,
+              );
+            }
             xhr.abort();
           }
         },
